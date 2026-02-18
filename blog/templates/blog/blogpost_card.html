@@ -1,0 +1,46 @@
+{% load i18n %}
+
+<div class="blogpost-card card h-100">
+    <div class="card-header d-flex flex-row justify-content-between align-items-start">
+        <h4 class="card-title text-primary"><a class="text-reset" href="{{ blog_post.get_absolute_url }}">{{ blog_post.title }}</a></h4>
+        {% if user == blog_post.author %}
+            <div class="dropstart">
+                <button class="btn text-end border-dark" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-three-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu p-2">
+                    <li>
+                        <a class="text-decoration-none" href="{% url 'blog:blog-update' blog_post.pk %}" aria_label="{% trans 'Edit blog post' %}" title="{% trans 'Edit blog post' %}">
+                            <i class="bi bi-pencil-square"></i> {% trans 'Edit...' %}
+                        </a>
+                    </li>
+                    <li>
+                        <form class="delete-blogpost-form dropdown-item d-inline p-0" action="{% url 'blog:blog-delete' blog_post.pk %}?next={{ request.path }}" method="post">
+                            {% csrf_token %}
+                            <button class="btn btn-link text-danger text-decoration-none p-0" type="submit" aria_label="{% trans 'Delete blog post' %}" title="{% trans 'Delete blog post' %}">
+                                <i class="bi bi-trash3"></i> {% trans 'Delete' %}
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        <div class="card-text">{{ blog_post.content|truncatewords_html:40|safe }}</div>
+        <a href="{{ blog_post.get_absolute_url }}" class="card-link">{% trans 'Read more…' %}</a>
+    </div>
+    <div class="card-footer d-flex justify-content-between align-items-end">
+        <a class="" href="{{ blog_post.author.get_absolute_url }}" class="text-reset text-decoration-none fs-6">{{ blog_post.get_author_username_display }}</a>
+        <div class="d-flex gap-2">
+            <div><i class="bi bi-hand-thumbs-up"></i> {{ blog_post.likes_count }}</div>
+            <div><i class="bi bi-eye"></i> {{ blog_post.view_count }}</div>
+        </div>
+        <small class="text-body-secondary">{{ blog_post.last_edited_date.date }}</small>
+    </div>
+    {% if not blog_post.is_published %}
+        <div class="position-absolute fs-1 top-50 start-50 fw-bold" style="transform: translate(-50%, -50%) rotate(-45deg); color: lightgray; text-shadow: 3px 3px 3px gray">
+            Hidden
+        </div>
+    {% endif %}
+</div>

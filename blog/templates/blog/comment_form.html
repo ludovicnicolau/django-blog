@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+    <h1>{% trans 'Commenting' %} <a href="{{ blog_post.get_absolute_url }}">{{ blog_post.title }}</a></h1>
+
+    <form action="" method="post" class="d-flex flex-column">
+        {% csrf_token %}
+        <div class="form-group mb-4">
+            {{ form.text.label_tag }}
+            {{ form.text }}
+            {% if form.text.errors %}
+                <div class="text-danger mt-1 mb-1">{{ form.text.errors }}</div>
+            {% endif %}
+            <small class="form-text text-muted">{{ form.text.help_text }}</small>
+        </div>
+        <input type="submit" value="{% trans 'Comment' %}" class="btn btn-primary align-self-end">
+    </form>
+{% endblock %}

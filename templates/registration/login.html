@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+    <form action="{% url 'login' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}">
+        <table class="table">
+            <tr>
+                <td>{{form.username.label_tag}}</td>
+                <td>{{form.username}}</td>
+            </tr>
+            {% if form.username.errors %}
+                {% for error in form.username.errors %}
+                    <tr>
+                        <td colspan="2">{{ form.username.errors }}</td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+            <tr>
+                <td>{{form.password.label_tag}}</td>
+                <td>{{form.password}}</td>
+            </tr>            
+            {% if form.password.errors %}
+                {% for error in form.password.errors %}
+                    <tr>
+                        <td colspan="2">{{ form.password.errors }}</td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+            {% if form.non_field_errors %}
+                {% for error in form.non_field_errors %}
+                    <tr>
+                        <td colspan="2" class="text-danger">{{ error }}</td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+        </table>
+        <div class="d-flex align-items-end justify-content-end">
+            <a href="{% url 'users:registration' %}" class="me-4">{% trans "Don't have an account yet ? Register." %}</a>
+            <input type="submit" class="btn btn-primary" value="{% trans 'login' %}">
+        </div>
+    </form>
+{% endblock %}

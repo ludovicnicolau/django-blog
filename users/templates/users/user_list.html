@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+    {% if users %}
+        <ul class="list-unstyled row g-3">
+            {% for blogger in users %}
+                <li class="col-xl-4 col-12">
+                <div class="card h-100">
+                    <div class="card-header d-flex flex-row justify-content-between align-items-center">
+                        <h4 class="card-title text-primary"><a class="text-reset" href="{{ blogger.get_absolute_url }}">{{ blogger.username }}</a></h4>
+                        <div>
+                            <div>
+                                <i class="bi bi-file-text"></i> {{ blogger.blogpost_count }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        {{ blogger.biography }}
+                    </div>
+                    <div class="card-footer d-flex justify-content-end">
+                        {% blocktrans with date=blogger.date_joined.date %}
+                            <small class="text-body-secondary">Since {{ date }}</small>
+                        {% endblocktrans %}
+                    </div>
+                </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>{% trans 'There are no bloggers.' %}</p>
+    {% endif %}
+{% endblock %}

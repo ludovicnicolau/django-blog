@@ -1,0 +1,70 @@
+{% load i18n %}
+
+<nav class="navbar navbar-expand-lg sticky-top bg-dark bg-gradient" data-bs-theme="dark">
+    <div class="container-fluid">
+        <a href="{% url 'blog:home' %}" class="navbar-brand fs-4">Blog</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                {% with namespace=request.resolver_match.namespace url_name=request.resolver_match.url_name %}
+                    <li class="nav-item">
+                        <a 
+                            class="nav-link {% if namespace == 'blog' and url_name == 'home' %}active{% endif %}" 
+                            aria-current="page" 
+                            href="{% url 'blog:home' %}"
+                        >
+                            {% trans 'Home' %}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a 
+                            class="nav-link {% if namespace == 'blog' and url_name == 'blogs' %}active{% endif %}" 
+                            href="{% url 'blog:blogs' %}"
+                        >
+                            {% trans 'Blogs' %}
+                        </a>
+                    </li>                
+                    <li class="nav-item">
+                        <a 
+                            class="nav-link {% if namespace == 'users' and url_name == 'user-list' %}active{% endif %}" 
+                            href="{% url 'users:user-list' %}"
+                        >
+                            {% trans 'Bloggers' %}
+                        </a>
+                    </li>
+                {% endwith %}
+                {% if user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {{ user.username }}
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ user.get_absolute_url }}">{% trans 'Profile' %}</a></li>
+                            {% if perms.blog.add_blogpost %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'blog:blog-create' %}">{% trans 'Write blog post…' %}</a></li>
+                            {% endif %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form action="{% url 'logout' %}" method="post">
+                                    {% csrf_token %}
+                                    <input class="text-danger dropdown-item" type="submit" value="{% trans 'Logout' %}">
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link text-light" href="{% url 'login' %}?next={{ request.path }}">{% trans 'Login' %}</a>
+                    </li>
+                {% endif %}
+            </ul>
+            <form class="d-flex" role="search" method="GET" action="{% url 'blog:blogs' %}">
+                <input name="search" class="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
+                <button class="btn text-secondary btn-outline-secondary" type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+    <form action="" method="post" class="d-flex flex-column">
+        {% csrf_token %}
+        <div class="form-group mb-4">
+            {{ form.biography.label_tag }}
+            {{ form.biography }}
+        </div>
+        {% if form.errors %}
+            <div class="text-danger">
+                {{ form.errors }}
+            </div>
+        {% endif %}
+        <input class="btn btn-primary text-right border" type="submit" value="{% trans 'Update' %}">
+    </form>
+{% endblock %}

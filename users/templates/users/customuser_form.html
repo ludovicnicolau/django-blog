@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+    <form action="" method="post" class="mt-4">
+        {% csrf_token %}
+        <div class="form-group mb-4">
+            {{ form.username.label_tag }}
+            {{ form.username }}
+            {% if form.username.errors %}
+                <div class="text-danger mt-1 mb-1">{{ form.username.errors }}</div>
+            {% endif %}
+            <small class="form-text text-muted">{{ form.username.help_text }}</small>
+        </div>
+        <div class="form-group mb-4">
+            {{ form.password1.label_tag }}
+            {{ form.password1 }}
+            {% if form.password1.errors %}
+                <div class="text-danger mt-1 mb-1">{{ form.password1.errors }}</div>
+            {% endif %}
+            <small class="form-text text-muted">{{ form.password1.help_text }}</small>            
+        </div>
+        <div class="form-group mb-4">
+            {{ form.password2.label_tag }}
+            {{ form.password2 }}
+            {% if form.password2.errors %}
+                <div class="text-danger mt-1 mb-1">{{ form.password2.errors }}</div>
+            {% endif %}
+            <small class="form-text text-muted">{{ form.password2.help_text }}</small>
+        </div>
+        <input type="submit" class="btn btn-primary" value="{% trans 'Register' %}">
+    </form>
+{% endblock %}

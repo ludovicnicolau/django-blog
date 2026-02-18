@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+    <div class="w-100">
+        <h1 class="text-primary mb-0 d-flex justify-content-between">
+            <div>
+                {{ blog_post.title }} 
+                <a href="{% if blog_post.author %}{{blog_post.author.get_absolute_url}}{% endif %}" class="text-secondary fs-6">by {{ blog_post.get_author_username_display }}</a>
+            </div>
+            {% if blog_post.author == user %}
+                <div>
+                    <a class="fs-4 p-0" href="{% url 'blog:blog-update' blog_post.pk %}" aria_label="{% trans 'Edit blog post' %}" title="{% trans 'Edit blog post' %}"><i class="bi bi-pencil-square"></i></a>
+                    <form id="delete-blogpost-form" class="d-inline" action="{% url 'blog:blog-delete' blog_post.pk %}?next={{blog_post.author.get_absolute_url}}" method="post">
+                        {% csrf_token %}
+                        <button class="btn btn-link text-danger text-decoration-none fs-4 p-0" type="submit" aria_label="{% trans 'Delete blog post' %}" title="{% trans 'Delete blog post' %}">
+                            <i class="bi bi-trash3"></i>
+                        </button>
+                    </form>
+                </div>
+            {% endif %}
+        </h1>
+        <div class="text-secondary fs-6 mb-4 ps-1">{% trans 'last edition:' %} {{ blog_post.last_edited_date }}</div>
+        <div class="ps-5 pe-2 mt-5">{{ blog_post.content|safe }}</div>
+    </div>
+    <div class="mt-5" id="comments">
+        <div class="d-flex justify-content-between" style="height: 40px;">
+            <h3 class="h-100">{% trans 'Comments' %}</h3>
+            <div class="d-flex gap-3 align-items-center">
+                <div class="d-flex align-items-center">
+                    {% if user.is_authenticated %}
+                        <form id="like-form" class="d-inline" action="{% url 'api-blog:blogpost-like' pk=blog_post.pk %}" method="post">
+                            {% csrf_token %}
+                            <button class="btn btn-link fs-5 p-0" type="submit">
+                                <i id="liked-icon" class="bi bi-hand-thumbs-up-fill {% if not user_liked %} d-none {% endif %}" aria_label="{% trans 'Unlike this blog post' %}" title="{% trans 'Unlike this blog post' %}"></i>
+                                <i id="not-liked-icon" class="bi bi-hand-thumbs-up {% if user_liked %} d-none {% endif %}" aria_label="{% trans 'Like this blog post' %}" title="{% trans 'Like this blog post' %}"></i>
+                            </button>
+                        </form>
+                    {% else %}
+                        <a class="btn fs-5 p-0 link-unstyled text-primary" href="{% url 'login' %}?next={{ request.path }}">
+                            <!-- <i id="liked-icon" class="bi bi-hand-thumbs-up-fill {% if not user_liked %} d-none {% endif %}" aria_label="{% trans 'Like this blog post' %}" title="{% trans 'Like this blog post' %}"></i> -->
+                            <i id="not-liked-icon" class="bi bi-hand-thumbs-up {% if user_liked %} d-none {% endif %}" aria_label="{% trans 'Like this blog post' %}" title="{% trans 'Like this blog post' %}"></i>
+                        </a>
+                    {% endif %}
+                    <span id="likes-count" class="fs-4 ms-1">
+                        {{ blog_post.likes_count }}
+                    </span>
+                </div>                
+                <div class="d-flex align-items-center"><i class="bi bi-eye text-primary fs-5"></i> <span class="fs-4 ms-1">{{ blog_post.view_count }}</span></div>
+            </div>
+        </div>
+        <div class="d-flex flex-column">
+            {% for comment in blog_post.comments.all %}
+                <div class="card ms-2 me-2 p-0">
+                    <div class="card-body mx-0"><div class="card-text">{{ comment.text }}</div></div>
+                    <div class="card-footer text-end text-secondary">
+                        {% blocktrans with author=comment.get_author_username_display date=comment.last_edited_date %}
+                            By {{ author }}, {{date}}
+                        {% endblocktrans %}
+                    </div>
+                </div>
+            {% empty %}
+                <p class="align-self-center my-5 text-secondary">{% trans 'Be the first to comment.' %}</p>
+            {% endfor %}
+            <a href="{% url 'blog:comment-form' pk=blog_post.pk %}" class="btn btn-primary ms-2 me-2 mt-2 d-block mx-auto"  aria_label="{% trans 'Leave a comment…' %}" title="{% trans 'Leave a comment…' %}">
+                {% trans 'Leave a comment…' %}
+            </a>
+        </div>
+    </div>
+
+    {% include 'modals/confirm_delete_modal.html' %}
+
+    <script>
+        const delete_form = document.querySelector('#delete-blogpost-form');
+        const modal = document.querySelector('#my-modal');
+        delete_form.addEventListener('submit', e => {            
+            e.preventDefault();
+            modal.querySelector('.modal-body__text').innerHTML = `Are you sure you want to delete <span class="fw-bold">{{ blog_post.title }}</span>`;
+            modal.querySelector('#delete-button').onclick = () => e.target.submit();
+            const myModal = new bootstrap.Modal(document.getElementById('my-modal'));
+            myModal.show();
+        });
+    </script>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'blog/js/blogpost_detail.js' %}"></script>
+{% endblock %}

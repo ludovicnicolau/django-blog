@@ -1,0 +1,25 @@
+{% load i18n %}
+
+<ul class="row g-2 list-unstyled blogpost_list">
+    {% for blog_post in blog_posts %}
+        <li class="col-lg-4 col-12">
+          {% include 'blog/blogpost_card.html' with blog_post=blog_post %}
+        </li>
+    {% endfor %}
+</ul>
+
+{% include 'modals/confirm_delete_modal.html' %}
+
+<script>
+    const blogpost_list = document.querySelector('.blogpost_list');
+    const modal = document.querySelector('#my-modal');
+    blogpost_list.addEventListener('submit', e => {
+        if (e.target.classList.contains('delete-blogpost-form')) {
+            e.preventDefault();
+            modal.querySelector('.modal-body__text').innerHTML = `Are you sure you want to delete <span class="fw-bold">${e.target.closest('.dropstart').previousElementSibling.querySelector('a').innerHTML}</span>`;
+            modal.querySelector('#delete-button').onclick = () => e.target.submit();
+            const myModal = new bootstrap.Modal(document.getElementById('my-modal'));
+            myModal.show();
+        }
+    });
+</script>

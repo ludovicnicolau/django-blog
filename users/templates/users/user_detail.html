@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+    <h1 class="text-primary">{{ profile_user.username }}</h1>
+    <hr>
+    <h2 class="mt-3 mb-3">{% trans 'Biography' %} {% if user_is_author %}<a href="{% url 'users:biography-update' %}" aria_label="{% trans 'Edit biography' %}" title="{% trans 'Edit biography' %}">
+        <i class="bi bi-pencil-square"></i></a>{% endif %}
+    </h2>
+    <div class="ms-3">
+        {% if profile_user.biography %}
+            {{ profile_user.biography|linebreaks }}
+        {% else %}
+            {% trans 'This blogger has no biography.' %}
+        {% endif %}
+    </div>
+    {% if perms.blog.add_blogpost %}
+    <hr class="mt-5">
+    <div class="d-flex align-items-center justify-content-start">
+        <h2 class="mt-3 mb-3">{% trans 'List of posts' %}</h2>
+        {% if user == profile_user %}
+            <a class="text-primary ms-3" href="{% url 'blog:blog-create' %}" aria-label="{% trans 'Add blog post' %}" title="{% trans 'Add blog post' %}"><i class="bi bi-plus-circle fs-4"></i></a>
+        {% endif %}
+    </div>
+        {% if not profile_user.blog_posts.exists %}
+            <div class="ms-3">
+                {% trans 'This blogger has not written any blog post yet!' %}
+            </div>
+        {% else %}
+            <ul class="list-unstyled d-flex flex-column gap-3 ms-3">
+                {% include 'blog/blogpost_cards.html' with blog_posts=profile_user.blog_posts.all %}
+            </ul>
+        {% endif %}
+    {% endif %}
+    {% if user == profile_user %}
+        <hr class="my-5">
+        <div class="text-end">
+            <a class="btn btn-danger" href="{% url 'users:user-delete' %}">{% trans 'Delete account' %}</a>
+        </div>
+    {% endif %}
+
+{% endblock %}

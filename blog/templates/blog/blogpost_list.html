@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+    <div class="d-flex justify-content-end mb-4">
+        <form method="get">
+            <select class="form-select" name="order_by" id="blogposts_order_by">
+                <option value="date-desc" {% if not request.GET.order_by or request.GET.order_by == 'date-desc' %}selected{% endif %}>{% trans 'Most recent' %}</option>
+                <option value="date-asc" {% if request.GET.order_by == 'date-asc' %}selected{% endif %}>{% trans 'Oldest' %}</option>
+                <option value="like-desc" {% if request.GET.order_by == 'like-desc' %}selected{% endif %}>{% trans 'Most liked' %}</option>
+                <option value="like-asc" {% if request.GET.order_by == 'like-asc' %}selected{% endif %}>{% trans 'Less liked' %}</option>
+                <option value="view-desc" {% if request.GET.order_by == 'view-desc' %}selected{% endif %}>{% trans 'Most viewed' %}</option>
+                <option value="view-asc" {% if request.GET.order_by == 'view-asc' %}selected{% endif %}>{% trans 'Less viewed' %}</option>
+            </select>
+            {% for key, value in request.GET.items %}
+                {% if key != 'order_by' %}
+                    <input type="hidden" name="{{ key }}" value="{{ value }}">
+                {% endif %}
+            {% endfor %}
+        </form>
+    </div>
+    {% if not blog_posts %}
+        <p>{% trans 'There are no blog posts yet!' %}</p>
+    {% else %}
+        {% include 'blog/blogpost_cards.html' with blog_posts=blog_posts %}
+    {% endif %}
+
+    <script>
+        const select = document.querySelector('#blogposts_order_by');
+        select.addEventListener('change', e => {
+            select.parentElement.submit();
+        })
+
+    </script>
+{% endblock %}

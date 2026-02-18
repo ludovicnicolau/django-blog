@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+    <h1 class="text-primary">{% trans 'Welcome' %}</h1>
+    {% blocktrans %}
+        <p>
+            Welcome to our corner of the web — a space for curious minds and passionate readers. 
+            Here, we dive into the worlds that shape modern culture: technology, film, and video games. 
+            Whether it’s breaking down the latest innovations, uncovering hidden cinematic gems, or exploring game design and storytelling, 
+            we’re all about sharing ideas that spark interest and fuel creativity.
+        </p>
+        <p>    
+            Our articles are written for thinkers, dreamers, and fans alike — people who love discovering new perspectives, debating trends, 
+            and enjoying the details that make each topic worth exploring. 
+            So grab a cup of coffee, settle in, and browse through insights, reviews, and reflections that connect tech, entertainment, and imagination in one place.
+        </p>
+        <p>
+            This isn’t just a blog — it’s a growing community built around curiosity and conversation. Welcome aboard.
+        </p>
+    {% endblocktrans %}
+{% endblock %}
