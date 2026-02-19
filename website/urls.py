@@ -19,10 +19,16 @@ from django.urls import include, path, reverse_lazy
 from django.views.generic import RedirectView
 from rest_framework_simplejwt.views import (TokenObtainPairView,
                                             TokenRefreshView, TokenVerifyView)
+from django.http import HttpResponse
+
+def health_check(request):
+    return HttpResponse("OK", status=200)
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('blog/', include('blog.urls')),
+    path('health-check/', health_check),
     path('', RedirectView.as_view(url=reverse_lazy('blog:home'), permanent=True)),
     path('users/', include('users.urls')),
     path('users/', include('django.contrib.auth.urls')),
