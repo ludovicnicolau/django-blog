@@ -2,6 +2,7 @@
 *.pem
 .vscode/
 TODO
+rest_api.http
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
