@@ -26,11 +26,11 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-du&6f&ism4w7*ii-wma
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DJANGO_DEBUG', 'False').lower() in ('true', '1', 'yes')
 
-ALLOWED_HOSTS = ['localhost']
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', 'localhost').split(',')
 
 if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    CSRF_TRUSTED_ORIGINS = ['https://localhost']
+    CSRF_TRUSTED_ORIGINS = ['https://localhost', 'https://django-blog-jq2v.onrender.com']
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 
