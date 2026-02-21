@@ -13,4 +13,4 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Launch tests
-      run: docker compose -f compose.test.yml --build --abort-on-container-exit
+      run: docker compose -f compose.test.yml up --build --abort-on-container-exit
