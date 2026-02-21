@@ -3,6 +3,8 @@
 .vscode/
 TODO
 rest_api.http
+pinger.py
+staticfiles/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
