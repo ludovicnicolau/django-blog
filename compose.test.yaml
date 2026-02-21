@@ -28,6 +28,6 @@ services:
       - POSTGRES_HOST=db
       - POSTGRES_PORT=5432
       - POSTGRES_DB=testdb
-    command: ["sh", "-c", "sleep 30 && python manage.py collectstatic --noinput --clear && python manage.py migrate --noinput && python manage.py test"]
+    command: ["sh", "-c", "python manage.py collectstatic --noinput --clear && python manage.py migrate --noinput && python manage.py test --parallel"]
     ports:
       - 8000:8000
