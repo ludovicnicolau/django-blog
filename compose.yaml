@@ -37,8 +37,6 @@ services:
       - ./public_certificate.pem:/etc/nginx/ssl/cert.pem:ro
       - ./private_key.pem:/etc/nginx/ssl/key.pem:ro
       - static_volume:/var/www/static
-    depends_on:
-      - blog
     restart: unless-stopped
 
 volumes:
