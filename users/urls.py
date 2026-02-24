@@ -3,13 +3,14 @@ from django.contrib.auth.views import LoginView, PasswordChangeView, PasswordCha
 
 from .views import RegisterView, registration_success, BiographyUpdateView, deletion_success
 from . import views
+from . import forms
 
 app_name = 'users'
 urlpatterns = [
     path('', views.BloggerListView.as_view(), name='user-list'),
     path('registration/', RegisterView.as_view(), name='registration'),
     path('registration-success/', registration_success, name='registration-success'),
-    path('login/', LoginView.as_view(), name='login'),
+    path('login/', LoginView.as_view(form_class=forms.LoginForm, template_name='users/login.html'), name='login'),
     path('password-change-done/', PasswordChangeDoneView.as_view(), name='password-change-done'),
     path('deleted-user/', views.deleted_profile, name='user-deleted-profile'),
     path('deletion-success/', deletion_success, name='deletion-success'),

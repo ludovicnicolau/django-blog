@@ -1,8 +1,26 @@
-from django.contrib.auth.forms import UserCreationForm, UsernameField
+from django.contrib.auth.forms import UserCreationForm, UsernameField, AuthenticationForm
 from django import forms
 from django.forms import TextInput, PasswordInput
+from django.utils.translation import gettext_lazy as _
 
 from .models import CustomUser
+
+class LoginForm(AuthenticationForm):
+    username = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': _('username'),
+        }),
+        label=_('Username'),
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': _('password'),
+        }),
+        label=_('Password'),
+    )
+
 
 class RegisterForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
