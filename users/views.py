@@ -70,6 +70,7 @@ class BloggerDetailView(DetailView):
         author = self.object
         user_is_author = self.request.user.id == author.id
         context['user_is_author'] = user_is_author
+        context['profile_user_is_a_blogger'] = author.has_perm('blog.add_blogpost')
         
         return context
 

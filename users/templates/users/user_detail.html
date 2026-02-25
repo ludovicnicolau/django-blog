@@ -14,14 +14,14 @@
             {% trans 'This blogger has no biography.' %}
         {% endif %}
     </div>
-    {% if perms.blog.add_blogpost %}
-    <hr class="mt-5">
-    <div class="d-flex align-items-center justify-content-start">
-        <h2 class="mt-3 mb-3">{% trans 'List of posts' %}</h2>
-        {% if user == profile_user %}
-            <a class="text-primary ms-3" href="{% url 'blog:blog-create' %}" aria-label="{% trans 'Add blog post' %}" title="{% trans 'Add blog post' %}"><i class="bi bi-plus-circle fs-4"></i></a>
-        {% endif %}
-    </div>
+    {% if profile_user_is_a_blogger %}
+        <hr class="mt-5">
+        <div class="d-flex align-items-center justify-content-start">
+            <h2 class="mt-3 mb-3">{% trans 'List of posts' %}</h2>
+            {% if user_is_author %}
+                <a class="text-primary ms-3" href="{% url 'blog:blog-create' %}" aria-label="{% trans 'Add blog post' %}" title="{% trans 'Add blog post' %}"><i class="bi bi-plus-circle fs-4"></i></a>
+            {% endif %}
+        </div>
         {% if not profile_user.blog_posts.exists %}
             <div class="ms-3">
                 {% trans 'This blogger has not written any blog post yet!' %}
@@ -32,7 +32,7 @@
             </ul>
         {% endif %}
     {% endif %}
-    {% if user == profile_user %}
+    {% if user_is_author %}
         <hr class="my-5">
         <div class="text-end">
             <a class="btn btn-danger" href="{% url 'users:user-delete' %}">{% trans 'Delete account' %}</a>
