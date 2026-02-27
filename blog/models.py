@@ -13,6 +13,7 @@ class BlogPost(models.Model):
     last_edited_date = models.DateTimeField(auto_now=True)
     is_published = models.BooleanField(verbose_name=_('is published'), default=False)
     likes = models.ManyToManyField(settings.AUTH_USER_MODEL, through='Like')
+    categories = models.ManyToManyField('Category', related_name='blogposts')
     view_count = models.PositiveBigIntegerField(default=0, blank=True, null=True)
 
     @property
@@ -58,3 +59,14 @@ class Like(models.Model):
         unique_together = ('blog_post', 'user')
         verbose_name = _('Like')
         verbose_name_plural = _('Likes')
+
+
+class Category(models.Model):
+    name = models.CharField(max_length=50, blank=False, null=False)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = _('Category')
+        verbose_name_plural = _('Categories')
