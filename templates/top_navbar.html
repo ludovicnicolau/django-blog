@@ -25,7 +25,15 @@
                         >
                             {% trans 'Blogs' %}
                         </a>
-                    </li>                
+                    </li>
+                    <li class="nav-item">
+                        <a 
+                            class="nav-link {% if namespace == 'blog' and url_name == 'category-list' %}active{% endif %}" 
+                            href="{% url 'blog:category-list' %}"
+                        >
+                            {% trans 'Categories' %}
+                        </a>
+                    </li>              
                     <li class="nav-item">
                         <a 
                             class="nav-link {% if namespace == 'users' and url_name == 'user-list' %}active{% endif %}" 

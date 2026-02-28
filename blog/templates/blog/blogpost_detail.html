@@ -24,15 +24,15 @@
         <div class="text-secondary fs-6 mb-4 ps-1">{% trans 'last edition:' %} {{ blog_post.last_edited_date }}</div>
         <div class="ps-5 pe-2 mt-5">{{ blog_post.content|safe }}</div>
     </div>
-    <div class="mt-5 d-flex flex-row" id="categories">
+    <ul class="mt-5 d-flex flex-row list-unstyled" id="categories">
         {% for category in blog_post.categories.all %}
-            <div class="px-2 py-1 rounded-pill border">
-                {{ category.name }}
-            </div>
+            <li class="">
+                <a class="px-2 py-1 rounded-pill border text-decoration-none link-dark" href="{{ category.get_absolute_url }}">{{ category.name }}</a>
+            </li>
         {% empty %}
             {% trans "This blog post has no category." %}
         {% endfor %}
-    </div>
+    </ul>
     <div class="mt-5" id="comments">
         <div class="d-flex justify-content-between" style="height: 40px;">
             <h3 class="h-100">{% trans 'Comments' %}</h3>

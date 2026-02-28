@@ -66,6 +66,10 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def get_absolute_url(self):
+        return reverse("blog:category-detail", kwargs={"name": self.name})
+    
 
     class Meta:
         verbose_name = _('Category')

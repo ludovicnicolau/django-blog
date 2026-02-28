@@ -7,9 +7,10 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.generic import CreateView, DetailView, ListView, UpdateView, DeleteView
 from django.db.models import FloatField
+from django.core.paginator import Paginator
 
 from .forms import BlogPostForm, CommentForm
-from .models import BlogPost, Comment
+from .models import BlogPost, Comment, Category
 
 
 def home(request):
@@ -135,3 +136,38 @@ class BlogPostDeleteView(PermissionRequiredMixin, UserPassesTestMixin, DeleteVie
 
     def test_func(self):
         return self.get_object().author == self.request.user
+
+
+class CategoryListView(ListView):
+    model = Category
+    template_name = 'blog/category_list.html'
+    context_object_name = 'categories'
+
+
+class CategoryDetailView(DetailView):
+    model = Category
+    template_name = 'blog/category_detail.html'
+    context_object_name = 'category'
+    queryset = Category.objects.all().prefetch_related('blogposts', 'blogposts__author')
+
+    def get_object(self):
+        category = get_object_or_404(self.get_queryset(), name=self.kwargs['name'])
+        return category
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        print(self.object.blogposts.count())
+        paginator = Paginator(self.object.blogposts.all(), 9)
+        print(paginator.num_pages)
+        print(paginator.count)
+        context['paginator'] = paginator
+        if paginator.num_pages > 1:
+            context['is_paginated'] = True
+        else:
+            context['is_paginated'] = False
+        page = self.request.GET.get('page') 
+        if page is None:
+            page = 1
+        context['page_obj'] = paginator.page(page)
+        context['blogposts'] = paginator.get_page(page)
+        return context

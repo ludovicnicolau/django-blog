@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ category.name }}{% endblock %}
+
+{% block content %}
+    {% include 'blog/blogpost_cards.html' with blog_posts=blogposts %}
+{% endblock %}
