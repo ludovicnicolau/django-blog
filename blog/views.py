@@ -154,7 +154,7 @@ class CategoryDetailView(DetailView):
         queryset = self.queryset.prefetch_related(
             Prefetch(
                 'blogposts',
-                BlogPost.objects.filter(is_published=True).annotate(likes_count=Count('likes'))
+                BlogPost.objects.filter(is_published=True).annotate(likes_count=Count('likes')).order_by('-last_edited_date')
             ),
             'blogposts__author'
         )
