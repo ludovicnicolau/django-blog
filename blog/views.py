@@ -148,7 +148,17 @@ class CategoryDetailView(DetailView):
     model = Category
     template_name = 'blog/category_detail.html'
     context_object_name = 'category'
-    queryset = Category.objects.all().prefetch_related(Prefetch('blogposts', BlogPost.objects.filter(is_published=True)), 'blogposts__author')
+    queryset = Category.objects.all()
+
+    def get_queryset(self):
+        queryset = self.queryset.prefetch_related(
+            Prefetch(
+                'blogposts',
+                BlogPost.objects.filter(is_published=True).annotate(likes_count=Count('likes'))
+            ),
+            'blogposts__author'
+        )
+        return queryset
 
     def get_object(self):
         category = get_object_or_404(self.get_queryset(), name=self.kwargs['name'])
