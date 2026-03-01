@@ -6,7 +6,7 @@ from django.db.models import Count, Q, When, Case, F
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.generic import CreateView, DetailView, ListView, UpdateView, DeleteView
-from django.db.models import FloatField
+from django.db.models import FloatField, Prefetch
 from django.core.paginator import Paginator
 
 from .forms import BlogPostForm, CommentForm
@@ -148,7 +148,7 @@ class CategoryDetailView(DetailView):
     model = Category
     template_name = 'blog/category_detail.html'
     context_object_name = 'category'
-    queryset = Category.objects.all().prefetch_related('blogposts', 'blogposts__author')
+    queryset = Category.objects.all().prefetch_related(Prefetch('blogposts', BlogPost.objects.filter(is_published=True)), 'blogposts__author')
 
     def get_object(self):
         category = get_object_or_404(self.get_queryset(), name=self.kwargs['name'])
@@ -156,10 +156,7 @@ class CategoryDetailView(DetailView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        print(self.object.blogposts.count())
         paginator = Paginator(self.object.blogposts.all(), 9)
-        print(paginator.num_pages)
-        print(paginator.count)
         context['paginator'] = paginator
         if paginator.num_pages > 1:
             context['is_paginated'] = True

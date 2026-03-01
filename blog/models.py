@@ -62,14 +62,13 @@ class Like(models.Model):
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=50, blank=False, null=False, unique=True)
+    name = models.CharField(max_length=50, blank=False, null=False, unique=True, verbose_name=_('name'))
 
     def __str__(self):
         return self.name
     
     def get_absolute_url(self):
         return reverse("blog:category-detail", kwargs={"name": self.name})
-    
 
     class Meta:
         verbose_name = _('Category')

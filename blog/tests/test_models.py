@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from blog.models import BlogPost, Comment
+from blog.models import BlogPost, Comment, Category
 from django.contrib.auth import get_user_model
 
 import time
@@ -120,3 +120,33 @@ class CommentModelTest(TestCase):
         comment = Comment.objects.get(text='This is a third comment about a blog post.')
         self.assertEqual('Anonymous', comment.get_author_username_display)
 
+class CategoryModelTest(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.category = Category.objects.create(name='movies')
+    
+    def test_get_absolute_url(self):
+        expected_url = f"/blog/categories/{self.category.name}/"
+        self.assertEqual(expected_url, self.category.get_absolute_url())
+    
+    def test_name_label(self):
+        label = self.category._meta.get_field('name').verbose_name
+        expected_name = 'name'
+        self.assertEqual(expected_name, label)
+    
+    def test_name_unique(self):
+        is_unique = self.category._meta.get_field('name').unique
+        self.assertTrue(is_unique)
+    
+    def test_name_not_null(self):
+        is_null = self.category._meta.get_field('name').null
+        self.assertFalse(is_null)
+    
+    def test_name_not_blank(self):
+        is_blank = self.category._meta.get_field('name').blank
+        self.assertFalse(is_blank)
+    
+    def test_object_name_is_name(self):
+        self.assertEqual(str(self.category), self.category.name)
+     

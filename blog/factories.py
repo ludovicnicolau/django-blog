@@ -6,21 +6,7 @@ from django.utils import timezone
 import factory
 from datetime import timedelta
 
-from .models import BlogPost
-
-
-# class BloggerGroupFactory(factory.django.DjangoModelFactory):
-#     class Meta:
-#         model = Group
-    
-#     name = 'bloggers'
-#     @factory.post_generation
-#     def permissions(self, create, exctracted, **kwargs):
-#         if not create:
-#             return
-#         if exctracted:
-
-
+from .models import BlogPost, Category
 
 class UserFactory(factory.django.DjangoModelFactory):
     class Meta:

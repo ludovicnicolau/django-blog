@@ -4,7 +4,7 @@ from django.contrib.auth.models import Permission, Group
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 
-from blog.models import BlogPost, Comment
+from blog.models import BlogPost, Comment, Category
 from blog.factories import BlogPostFactory, UserFactory
 
 import time
@@ -177,6 +177,7 @@ class BlogPostCreateViewTest(TestCase):
         permission = Permission.objects.get(name='Can add Blog Post')
         blogger.user_permissions.add(permission)
         User.objects.create_user(username='Reader', password='topsecret')
+        cls.category = Category.objects.create(name='movies')
 
     def test_view_accessible_at_location_if_has_permission(self):
         login = self.client.login(username='Blogger', password='topsecret')
@@ -195,13 +196,27 @@ class BlogPostCreateViewTest(TestCase):
 
     def test_redirect_to_correct_url(self):
         login = self.client.login(username='Blogger', password='topsecret')
-        response = self.client.post(reverse('blog:blog-create'), data={'title': 'The title', 'content': 'The content.'})
+        response = self.client.post(
+            reverse('blog:blog-create'),
+            data={
+                'title': 'The title',
+                'content': 'The content.',
+                'categories': [self.category.pk,],
+            }
+        )
         blog_post = BlogPost.objects.get(title__exact='The title')
         self.assertRedirects(response, reverse('blog:blog-detail', kwargs={'pk': blog_post.pk}))
     
     def test_author_is_correct_on_created_blog_post(self):        
         login = self.client.login(username='Blogger', password='topsecret')
-        response = self.client.post(reverse('blog:blog-create'), data={'title': 'The title', 'content': 'The content.'})
+        response = self.client.post(
+            reverse('blog:blog-create'),
+            data={
+                'title': 'The title', 
+                'content': 'The content.',
+                'categories': [self.category.pk,],
+            }
+        )
         blog_post = BlogPost.objects.get(title__exact='The title')
         blogger = User.objects.get(username__exact='Blogger')
         self.assertEqual(blogger.pk, blog_post.author.pk)
@@ -217,6 +232,7 @@ class BlogPostUpdateViewTest(TestCase):
         blogger2 = User.objects.create_user(username='Blogger2', password='topsecret')
         blogger2.user_permissions.add(permission)
         reader = User.objects.create_user(username='Reader', password='topsecret')
+        cls.category = Category.objects.create(name='movies')
         BlogPost.objects.create(title='The title.', content='The content.', author=blogger1)
     
     def test_view_accessible_at_location(self):
@@ -249,7 +265,15 @@ class BlogPostUpdateViewTest(TestCase):
         login = self.client.login(username='Blogger1', password='topsecret')
         response = self.client.get(reverse('blog:blog-update', kwargs={'pk': blogpost.pk}))
         self.assertEqual(response.status_code, 200)
-        response = self.client.post(reverse('blog:blog-update', kwargs={'pk': blogpost.pk}), data={'title': 'The new title.', 'content': 'A random content', 'is_published': True})
+        response = self.client.post(
+            reverse('blog:blog-update', kwargs={'pk': blogpost.pk}), 
+            data={
+                'title': 'The new title.', 
+                'content': 'A random content', 
+                'is_published': True,
+                'categories': [self.category.pk,],
+            }
+        )
         self.assertRedirects(response, reverse('blog:blog-detail', kwargs={'pk': blogpost.pk}))
 
 
@@ -284,3 +308,76 @@ class TestBlogPostDeleteView(TestCase):
         response = self.client.post(reverse('blog:blog-delete', kwargs={'pk': self.blogpost.pk}), data={})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(BlogPost.objects.count(), 0)
+
+
+class TestCategoryListView(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.category = Category.objects.create(name='movies')
+    
+    def test_view_accessible_at_location(self):
+        response = self.client.get('/blog/categories/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_accessible_by_name(self):
+        response = self.client.get(reverse('blog:category-list'))
+        self.assertEqual(response.status_code, 200)
+    
+    def test_use_correct_template(self):
+        response = self.client.get(reverse('blog:category-list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'blog/category_list.html')
+    
+    def test_context_object_name_is_categories(self):
+        response = self.client.get(reverse('blog:category-list'))
+        self.assertEqual(response.status_code, 200)
+        expected_context_object_name = 'categories'
+        self.assertIn(expected_context_object_name, response.context)
+
+
+class TestCategoryDetailView(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.category = Category.objects.create(name='movies')
+        blogposts = BlogPostFactory.create_batch(10, is_published=True)
+        cls.category.blogposts.add(*blogposts)
+        unpublished_blogpost = BlogPostFactory.create(is_published=False)
+        cls.category.blogposts.add(unpublished_blogpost)
+    
+    def test_view_accessible_at_location(self):
+        response = self.client.get(f'/blog/categories/{self.category.name}/')
+        self.assertEqual(response.status_code, 200)
+    
+    def test_view_accessible_by_name(self):
+        response = self.client.get(reverse('blog:category-detail', kwargs={'name': self.category.name}))
+        self.assertEqual(response.status_code, 200)
+    
+    def test_use_correct_template(self):
+        response = self.client.get(self.category.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'blog/category_detail.html')
+    
+    def test_use_correct_context_object_name(self):
+        expected_context_object_name = 'category'
+        response = self.client.get(self.category.get_absolute_url())
+        self.assertIn(expected_context_object_name, response.context)
+    
+    def test_blogposts_are_in_context(self):
+        response = self.client.get(self.category.get_absolute_url())
+        self.assertIn('blogposts', response.context)
+
+    def test_cannot_see_hidden_blogposts(self):
+        response = self.client.get(self.category.get_absolute_url())
+        self.assertEqual(len(response.context['blogposts']), 9)
+        response = self.client.get(self.category.get_absolute_url() + '?page=2')
+        self.assertEqual(len(response.context['blogposts']), 1)
+
+    def test_blogposts_paginated_by_9(self):
+        response = self.client.get(self.category.get_absolute_url())
+        self.assertIn('is_paginated', response.context)
+        self.assertTrue(response.context['is_paginated'])
+        self.assertIn('paginator', response.context)
+        self.assertIn('page_obj', response.context)
+        self.assertEqual(len(response.context['blogposts']), 9)
