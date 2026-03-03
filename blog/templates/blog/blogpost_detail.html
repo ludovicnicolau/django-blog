@@ -39,7 +39,7 @@
             <div class="d-flex gap-3 align-items-center">
                 <div class="d-flex align-items-center">
                     {% if user.is_authenticated %}
-                        <form id="like-form" class="d-inline" action="{% url 'api-blog:blogpost-like' pk=blog_post.pk %}" method="post">
+                        <form id="like-form" class="d-inline" action="{% url 'api-blog:blogpost-like' slug=blog_post.slug %}" method="post">
                             {% csrf_token %}
                             <button class="btn btn-link fs-5 p-0" type="submit">
                                 <i id="liked-icon" class="bi bi-hand-thumbs-up-fill {% if not user_liked %} d-none {% endif %}" aria_label="{% trans 'Unlike this blog post' %}" title="{% trans 'Unlike this blog post' %}"></i>

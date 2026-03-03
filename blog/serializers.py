@@ -11,8 +11,8 @@ class BlogPostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BlogPost
-        fields = ('id', 'title', 'content', 'last_edited_date', 'author_username', 'likes_count', 'is_published',)
-        read_only_fields = ('id', 'last_edited_date', 'author', 'likes_count',)
+        fields = ('id', 'slug', 'title', 'content', 'last_edited_date', 'author_username', 'likes_count', 'is_published',)
+        read_only_fields = ('id', 'slug', 'last_edited_date', 'author', 'likes_count',)
 
 
 class CommentSerializer(serializers.ModelSerializer):

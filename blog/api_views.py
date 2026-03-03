@@ -19,8 +19,10 @@ class BlogPostAPIViewSet(viewsets.ModelViewSet):
     search_fields = ['title', 'content',]
     ordering = ['-last_edited_date',]
     ordering_fields = ['last_edited_date', 'title', 'likes_count']
+    lookup_field = 'slug'
+    lookup_url_kwarg = 'slug'
     
-    def get_queryset(self):        
+    def get_queryset(self):
         queryset = self.queryset.annotate(likes_count=Count('like')).order_by('-last_edited_date').select_related('author')
         author_username = self.request.GET.get('author')
         if author_username:
@@ -48,7 +50,7 @@ class BlogPostAPIViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
     @action(methods=('get', 'post'), detail=True, url_path='comments', url_name='blogpost-comments', serializer_class=CommentSerializer)
-    def comments(self, request, pk=None):
+    def comments(self, request, slug=None):
         blog_post = self.get_object()
         if request.method == 'GET':
             queryset = blog_post.comments.all()
@@ -61,7 +63,7 @@ class BlogPostAPIViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
     
     @action(methods=('get', 'post',), permission_classes=(IsAuthenticated,), detail=True, url_path='like', url_name='like', serializer_class=LikeSerializer)
-    def toggle_like(self, request, pk=None):
+    def toggle_like(self, request, slug=None):
         if request.method == 'GET':
             return Response(status=status.HTTP_200_OK)
 

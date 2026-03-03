@@ -81,11 +81,11 @@ class BlogPostDetail(APITestCase):
         cls.url_name = 'api-blog:blogpost-detail'
     
     def test_view_url_exist_at_desired_location(self):
-        response = self.client.get(f'/api/blog/blogposts/{self.random_blogpost.pk}/')
+        response = self.client.get(f'/api/blog/blogposts/{self.random_blogpost.slug}/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
     
     def test_view_accessible_by_name(self):
-        response = self.client.get(reverse(self.url_name, kwargs={'pk': self.random_blogpost.pk}))
+        response = self.client.get(reverse(self.url_name, kwargs={'slug': self.random_blogpost.slug}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_random_user_cant_partial_update_blogpost(self):
@@ -93,7 +93,7 @@ class BlogPostDetail(APITestCase):
         data = {
             'title': 'New title',
         }
-        response = self.client.patch(reverse(self.url_name, kwargs={'pk': self.random_blogpost.pk}), data=data, format='json')
+        response = self.client.patch(reverse(self.url_name, kwargs={'slug': self.random_blogpost.slug}), data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
     
     def test_random_user_cant_fully_update_blogpost(self):
@@ -103,7 +103,7 @@ class BlogPostDetail(APITestCase):
             'content': 'New Content',
             'is_published': True,
         }
-        response = self.client.put(reverse(self.url_name, kwargs={'pk': self.random_blogpost.pk}), data=data, format='json')
+        response = self.client.put(reverse(self.url_name, kwargs={'slug': self.random_blogpost.slug}), data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_blogger_not_author_cant_partial_update_blogpost(self):
@@ -111,7 +111,7 @@ class BlogPostDetail(APITestCase):
         data = {
             'title': 'New title',
         }
-        response = self.client.patch(reverse(self.url_name, kwargs={'pk': self.random_blogpost.pk}), data=data, format='json')
+        response = self.client.patch(reverse(self.url_name, kwargs={'slug': self.random_blogpost.slug}), data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
     
     def test_blogger_not_author_cant_fully_update_blogpost(self):
@@ -121,7 +121,7 @@ class BlogPostDetail(APITestCase):
             'content': 'New Content',
             'is_published': True,
         }
-        response = self.client.put(reverse(self.url_name, kwargs={'pk': self.random_blogpost.pk}), data=data, format='json')
+        response = self.client.put(reverse(self.url_name, kwargs={'slug': self.random_blogpost.slug}), data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
     
     def test_author_can_partial_update_blogpost(self):
@@ -129,7 +129,7 @@ class BlogPostDetail(APITestCase):
         data = {
             'title': 'Partially updated title',
         }
-        response = self.client.patch(reverse(self.url_name, kwargs={'pk': self.random_blogpost.pk}), data=data, format='json')
+        response = self.client.patch(reverse(self.url_name, kwargs={'slug': self.random_blogpost.slug}), data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
     
     def test_author_can_fully_update_blogpost(self):
@@ -138,7 +138,7 @@ class BlogPostDetail(APITestCase):
             'title': 'Fully updated title',
             'content': 'Fully updated content',
         }
-        response = self.client.put(reverse(self.url_name, kwargs={'pk': self.random_blogpost.pk}), data=data, format='json')
+        response = self.client.put(reverse(self.url_name, kwargs={'slug': self.random_blogpost.slug}), data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
     
 
@@ -158,7 +158,7 @@ class TestBlogPostLikeAPI(APITestCase):
         self.assertFalse(self.random_blogpost.like_set.filter(user=self.random_user).exists())
         self.assertEqual(self.random_blogpost.like_set.count(), 0)
 
-        response = self.client.post(reverse(self.url_name, kwargs={'pk': self.random_blogpost.pk}))
+        response = self.client.post(reverse(self.url_name, kwargs={'slug': self.random_blogpost.slug}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         self.assertTrue(self.random_blogpost.like_set.filter(user=self.random_user).exists())
@@ -167,15 +167,15 @@ class TestBlogPostLikeAPI(APITestCase):
     def test_authenticated_user_can_unlike(self):
         self.client.force_authenticate(user=self.random_user)
         
-        self.client.post(reverse(self.url_name, kwargs={'pk': self.random_blogpost.pk}))
+        self.client.post(reverse(self.url_name, kwargs={'slug': self.random_blogpost.slug}))
         self.assertEqual(self.random_blogpost.like_set.count(), 1)
 
-        response = self.client.post(reverse(self.url_name, kwargs={'pk': self.random_blogpost.pk}))
+        response = self.client.post(reverse(self.url_name, kwargs={'slug': self.random_blogpost.slug}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         self.assertFalse(self.random_blogpost.like_set.filter(user=self.random_user).exists())
         self.assertEqual(self.random_blogpost.like_set.count(), 0)
     
     def test_unauthenticated_cannot_like(self):
-        response = self.client.post(reverse(self.url_name, kwargs={'pk': self.random_blogpost.pk}))
+        response = self.client.post(reverse(self.url_name, kwargs={'slug': self.random_blogpost.slug}))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
