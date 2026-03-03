@@ -47,34 +47,29 @@ class BlogPostDetailViewTest(TestCase):
     def setUpTestData(cls):
         cls.author = User.objects.create_user(username='Author', password='topsecret')
         user = User.objects.create_user(username='Random', password='topsecret')
-        cls.blogpost = BlogPost.objects.create(title='The title.', content='The content', author=cls.author)
+        cls.blogpost = BlogPost.objects.create(title='The title.', content='The content', author=cls.author, is_published=True)
         Comment.objects.create(text='A first comment.', author=user, blog_post=cls.blogpost)
         time.sleep(0.1)
         Comment.objects.create(text='A second comment.', author=user, blog_post=cls.blogpost)
     
     def test_view_url_exist_at_desired_location(self):
-        blog_post = BlogPost.objects.get(title__exact='The title.')
-        response = self.client.get(f'/blog/{blog_post.pk}/')
+        response = self.client.get(f'/blog/{self.blogpost.slug}/')
         self.assertEqual(response.status_code, 200)
     
     def test_view_accessible_by_name(self):
-        blog_post = BlogPost.objects.get(title__exact='The title.')
-        response = self.client.get(reverse('blog:blog-detail', kwargs={'pk': blog_post.pk}))
+        response = self.client.get(reverse('blog:blog-detail', kwargs={'slug': self.blogpost.slug}))
         self.assertEqual(response.status_code, 200)
 
     def test_use_the_correct_template(self):
-        blog_post = BlogPost.objects.get(title__exact='The title.')
-        response = self.client.get(reverse('blog:blog-detail', kwargs={'pk': blog_post.pk}))
+        response = self.client.get(self.blogpost.get_absolute_url())
         self.assertTemplateUsed(response, 'blog/blogpost_detail.html')
     
     def test_blog_post_name_in_context(self):
-        blog_post = BlogPost.objects.get(title__exact='The title.')
-        response = self.client.get(reverse('blog:blog-detail', kwargs={'pk': blog_post.pk}))
+        response = self.client.get(self.blogpost.get_absolute_url())
         self.assertTrue('blog_post' in response.context)
     
     def test_comments_are_displayed_from_oldest_to_most_recent(self):
-        blog_post = BlogPost.objects.get(title__exact='The title.')
-        response = self.client.get(reverse('blog:blog-detail', kwargs={'pk': blog_post.pk}))
+        response = self.client.get(self.blogpost.get_absolute_url())
         self.assertLess(response.context['blog_post'].comments.all()[0].last_edited_date, response.context['blog_post'].comments.all()[1].last_edited_date)
 
     def test_views_do_not_increase_if_viewer_is_author(self):
@@ -145,29 +140,29 @@ class CommentCreateViewTest(TestCase):
 
     def test_view_url_exist_at_desired_location_if_logged_in(self):
         self.client.force_login(user=self.reader)
-        response = self.client.get(f'/blog/{self.blogpost.pk}/create/')
+        response = self.client.get(f'/blog/{self.blogpost.slug}/create/')
         self.assertEqual(response.status_code, 200)
 
     def test_view_redirected_to_login_if_logged_out(self):
-        url = reverse('blog:comment-form', kwargs={'pk': self.blogpost.pk})
+        url = reverse('blog:comment-form', kwargs={'slug': self.blogpost.slug})
         response = self.client.get(url)
         next = f'?next={url}'
         self.assertRedirects(response, reverse('users:login') + next)
 
     def test_view_accessible_by_name(self):
         self.client.force_login(user=self.reader)
-        response = self.client.get(reverse('blog:comment-form', kwargs={'pk': self.blogpost.pk}))
+        response = self.client.get(reverse('blog:comment-form', kwargs={'slug': self.blogpost.slug}))
         self.assertEqual(response.status_code, 200)
 
     def test_view_use_the_correct_template(self):
         self.client.force_login(user=self.reader)
-        response = self.client.get(reverse('blog:comment-form', kwargs={'pk': self.blogpost.pk}))
+        response = self.client.get(reverse('blog:comment-form', kwargs={'slug': self.blogpost.slug}))
         self.assertTemplateUsed(response, 'blog/comment_form.html')
 
     def test_redirect_on_correct_url_on_success(self):
         self.client.force_login(user=self.reader)
-        response = self.client.post(reverse('blog:comment-form', kwargs={'pk': self.blogpost.pk}), data={'text': 'A great comment.'})
-        self.assertRedirects(response, reverse('blog:blog-detail', kwargs={'pk': self.blogpost.pk}, fragment='comments'))
+        response = self.client.post(reverse('blog:comment-form', kwargs={'slug': self.blogpost.slug}), data={'text': 'A great comment.'})
+        self.assertRedirects(response, reverse('blog:blog-detail', kwargs={'slug': self.blogpost.slug}, fragment='comments'))
 
 
 class BlogPostCreateViewTest(TestCase):
@@ -205,7 +200,7 @@ class BlogPostCreateViewTest(TestCase):
             }
         )
         blog_post = BlogPost.objects.get(title__exact='The title')
-        self.assertRedirects(response, reverse('blog:blog-detail', kwargs={'pk': blog_post.pk}))
+        self.assertRedirects(response, reverse('blog:blog-detail', kwargs={'slug': blog_post.slug}))
     
     def test_author_is_correct_on_created_blog_post(self):        
         login = self.client.login(username='Blogger', password='topsecret')
@@ -238,35 +233,35 @@ class BlogPostUpdateViewTest(TestCase):
     def test_view_accessible_at_location(self):
         blogpost = BlogPost.objects.get(title__exact='The title.')
         login = self.client.login(username='Blogger1', password='topsecret')
-        response = self.client.get(f'/blog/{blogpost.pk}/update/')
+        response = self.client.get(f'/blog/{blogpost.slug}/update/')
         self.assertEqual(response.status_code, 200)
 
     def test_view_accessible_by_name(self):
         blogpost = BlogPost.objects.get(title__exact='The title.')
         login = self.client.login(username='Blogger1', password='topsecret')
-        response = self.client.get(reverse('blog:blog-update', kwargs={'pk': blogpost.pk}))
+        response = self.client.get(reverse('blog:blog-update', kwargs={'slug': blogpost.slug}))
         self.assertEqual(response.status_code, 200)
 
     def test_view_forbidden_if_no_permission(self):
         blogpost = BlogPost.objects.get(title__exact='The title.')
         login = self.client.login(username='Reader', password='topsecret')
-        response = self.client.get(reverse('blog:blog-update', kwargs={'pk': blogpost.pk}))
+        response = self.client.get(reverse('blog:blog-update', kwargs={'slug': blogpost.slug}))
         self.assertEqual(response.status_code, 403)        
 
     def test_view_forbidden_if_not_the_author(self):
         blogpost = BlogPost.objects.get(title__exact='The title.')
         login = self.client.login(username='Blogger2', password='topsecret')
-        response = self.client.get(reverse('blog:blog-update', kwargs={'pk': blogpost.pk}))
+        response = self.client.get(reverse('blog:blog-update', kwargs={'slug': blogpost.slug}))
         self.assertEqual(response.status_code, 403)
 
     def test_correctly_redirected_after_update(self):
         author = User.objects.get(username='Blogger1')
         blogpost = BlogPost.objects.create(title='A random title', content='A random content', is_published=True, author=author)
         login = self.client.login(username='Blogger1', password='topsecret')
-        response = self.client.get(reverse('blog:blog-update', kwargs={'pk': blogpost.pk}))
+        response = self.client.get(reverse('blog:blog-update', kwargs={'slug': blogpost.slug}))
         self.assertEqual(response.status_code, 200)
         response = self.client.post(
-            reverse('blog:blog-update', kwargs={'pk': blogpost.pk}), 
+            reverse('blog:blog-update', kwargs={'slug': blogpost.slug}), 
             data={
                 'title': 'The new title.', 
                 'content': 'A random content', 
@@ -274,7 +269,7 @@ class BlogPostUpdateViewTest(TestCase):
                 'categories': [self.category.pk,],
             }
         )
-        self.assertRedirects(response, reverse('blog:blog-detail', kwargs={'pk': blogpost.pk}))
+        self.assertRedirects(response, reverse('blog:blog-detail', kwargs={'slug': blogpost.slug}))
 
 
 class TestBlogPostDeleteView(TestCase):
@@ -293,19 +288,19 @@ class TestBlogPostDeleteView(TestCase):
         Only users logged in with the blog.delete_blogpost permission can post on this view.
         """
         self.client.force_login(user=self.random_user)
-        response = self.client.post(reverse('blog:blog-delete', kwargs={'pk': self.blogpost.pk}), data={})
+        response = self.client.post(reverse('blog:blog-delete', kwargs={'slug': self.blogpost.slug}), data={})
         self.assertEqual(response.status_code, 403)
         self.assertEqual(BlogPost.objects.count(), 1)
     
     def test_blogger_not_author_cannot_delete(self):
         self.client.force_login(user=self.blogger_not_author)
-        response = self.client.post(reverse('blog:blog-delete', kwargs={'pk': self.blogpost.pk}), data={})
+        response = self.client.post(reverse('blog:blog-delete', kwargs={'slug': self.blogpost.slug}), data={})
         self.assertEqual(response.status_code, 403)
         self.assertEqual(BlogPost.objects.count(), 1)
     
     def test_author_can_delete(self):
         self.client.force_login(user=self.blogger)
-        response = self.client.post(reverse('blog:blog-delete', kwargs={'pk': self.blogpost.pk}), data={})
+        response = self.client.post(reverse('blog:blog-delete', kwargs={'slug': self.blogpost.slug}), data={})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(BlogPost.objects.count(), 0)
 

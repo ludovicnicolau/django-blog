@@ -64,7 +64,7 @@ class BlogPostModelTest(TestCase):
     
     def test_get_absolute_url(self):
         post = BlogPost.objects.get(title='A simple title.')
-        self.assertEqual(post.get_absolute_url(), f'/blog/{post.pk}/')
+        self.assertEqual(post.get_absolute_url(), f'/blog/{post.slug}/')
     
     def test_ordered_last_edited_first(self):
         posts = BlogPost.objects.all()

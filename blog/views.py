@@ -64,14 +64,14 @@ class BlogPostDetailView(DetailView):
 
     def get_queryset(self):
         return BlogPost.objects.select_related('author').prefetch_related('comments__author').annotate(likes_count=Count('likes'))
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
         blogpost = self.object
         
         if blogpost.author != self.request.user:
-            BlogPost.objects.filter(pk=self.kwargs['pk']).update(view_count=F('view_count') + 1)
+            BlogPost.objects.filter(pk=blogpost.pk).update(view_count=F('view_count') + 1)
 
         if self.request.user.is_authenticated:
             context['user_liked'] = blogpost.like_set.filter(user=self.request.user).exists()
@@ -85,16 +85,16 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
     form_class = CommentForm
     
     def get_success_url(self):
-        return reverse('blog:blog-detail', kwargs={'pk': self.object.blog_post.pk}, fragment='comments')
+        return reverse('blog:blog-detail', kwargs={'slug': self.object.blog_post.slug}, fragment='comments')
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['blog_post'] = get_object_or_404(BlogPost, pk=self.kwargs['pk'])
+        context['blog_post'] = get_object_or_404(BlogPost, slug=self.kwargs['slug'])
         return context
     
     def form_valid(self, form):
         form.instance.author = self.request.user
-        form.instance.blog_post = get_object_or_404(BlogPost, pk=self.kwargs['pk'])
+        form.instance.blog_post = get_object_or_404(BlogPost, slug=self.kwargs['slug'])
         form.save()
         return super().form_valid(form)
 
@@ -105,7 +105,7 @@ class BlogPostCreateView(PermissionRequiredMixin, CreateView):
     permission_required = ('blog.add_blogpost',)
 
     def get_success_url(self):
-        return reverse('blog:blog-detail', kwargs={'pk': self.object.pk,})
+        return reverse('blog:blog-detail', kwargs={'slug': self.object.slug,})
     
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -119,7 +119,7 @@ class BlogPostUpdateView(PermissionRequiredMixin, UserPassesTestMixin, UpdateVie
     permission_required = ('blog.change_blogpost',)
 
     def get_success_url(self):
-        return reverse('blog:blog-detail', kwargs={'pk': self.object.pk,})
+        return reverse('blog:blog-detail', kwargs={'slug': self.object.slug,})
     
     def test_func(self):
         return self.get_object().author == self.request.user

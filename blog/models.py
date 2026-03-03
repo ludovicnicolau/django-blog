@@ -19,9 +19,7 @@ class BlogPost(models.Model):
     view_count = models.PositiveBigIntegerField(default=0, blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        print('bfore')
         if not self.slug:
-            print('here')
             original_slug = slugify(self.title)
             unique_slug = original_slug
             counter = 1
@@ -38,7 +36,7 @@ class BlogPost(models.Model):
         return self.author.username if self.author and self.author.is_active else 'Anonymous'
 
     def get_absolute_url(self):
-        return reverse("blog:blog-detail", kwargs={"pk": self.pk})
+        return reverse("blog:blog-detail", kwargs={"slug": self.slug})
 
     def __str__(self):
         return f'{self.title} ({self.author.username})'

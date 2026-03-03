@@ -72,7 +72,7 @@
             {% empty %}
                 <p class="align-self-center my-5 text-secondary">{% trans 'Be the first to comment.' %}</p>
             {% endfor %}
-            <a href="{% url 'blog:comment-form' pk=blog_post.pk %}" class="btn btn-primary ms-2 me-2 mt-2 d-block mx-auto"  aria_label="{% trans 'Leave a comment…' %}" title="{% trans 'Leave a comment…' %}">
+            <a href="{% url 'blog:comment-form' slug=blog_post.slug %}" class="btn btn-primary ms-2 me-2 mt-2 d-block mx-auto"  aria_label="{% trans 'Leave a comment…' %}" title="{% trans 'Leave a comment…' %}">
                 {% trans 'Leave a comment…' %}
             </a>
         </div>
