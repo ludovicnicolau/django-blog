@@ -4,10 +4,12 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from tinymce.models import HTMLField
+from django.utils.text import slugify
 
 
 class BlogPost(models.Model):
     title = models.CharField(verbose_name=_('title'), max_length=100)
+    slug = models.SlugField(blank=True, null=True, unique=False, max_length=130)
     content = HTMLField(verbose_name=_('content'))
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='blog_posts', null=True)
     last_edited_date = models.DateTimeField(auto_now=True)
@@ -15,6 +17,21 @@ class BlogPost(models.Model):
     likes = models.ManyToManyField(settings.AUTH_USER_MODEL, through='Like')
     categories = models.ManyToManyField('Category', related_name='blogposts')
     view_count = models.PositiveBigIntegerField(default=0, blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        print('bfore')
+        if not self.slug:
+            print('here')
+            original_slug = slugify(self.title)
+            unique_slug = original_slug
+            counter = 1
+            while BlogPost.objects.filter(slug=unique_slug).exists():
+                unique_slug = f'{original_slug}-{counter}'
+                counter += 1
+            self.slug = unique_slug
+
+        super().save(*args, **kwargs)
+            
 
     @property
     def get_author_username_display(self):
