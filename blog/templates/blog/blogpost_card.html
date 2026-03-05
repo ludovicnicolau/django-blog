@@ -10,12 +10,12 @@
                 </button>
                 <ul class="dropdown-menu p-2">
                     <li>
-                        <a class="text-decoration-none" href="{% url 'blog:blog-update' blog_post.pk %}" aria_label="{% trans 'Edit blog post' %}" title="{% trans 'Edit blog post' %}">
+                        <a class="text-decoration-none" href="{% url 'blog:blog-update' slug=blog_post.slug %}" aria_label="{% trans 'Edit blog post' %}" title="{% trans 'Edit blog post' %}">
                             <i class="bi bi-pencil-square"></i> {% trans 'Edit...' %}
                         </a>
                     </li>
                     <li>
-                        <form class="delete-blogpost-form dropdown-item d-inline p-0" action="{% url 'blog:blog-delete' blog_post.pk %}?next={{ request.path }}" method="post">
+                        <form class="delete-blogpost-form dropdown-item d-inline p-0" action="{% url 'blog:blog-delete' slug=blog_post.slug %}?next={{ request.path }}" method="post">
                             {% csrf_token %}
                             <button class="btn btn-link text-danger text-decoration-none p-0" type="submit" aria_label="{% trans 'Delete blog post' %}" title="{% trans 'Delete blog post' %}">
                                 <i class="bi bi-trash3"></i> {% trans 'Delete' %}
