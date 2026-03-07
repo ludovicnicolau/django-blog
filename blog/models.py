@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from tinymce.models import HTMLField
 from django.utils.text import slugify
+from django.utils import timezone
 
 
 class BlogPost(models.Model):
@@ -13,6 +14,7 @@ class BlogPost(models.Model):
     content = HTMLField(verbose_name=_('content'))
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='blog_posts', null=True)
     last_edited_date = models.DateTimeField(auto_now=True)
+    published_date = models.DateTimeField(verbose_name=_('published date'), blank=True, null=True)
     is_published = models.BooleanField(verbose_name=_('is published'), default=False)
     likes = models.ManyToManyField(settings.AUTH_USER_MODEL, through='Like')
     categories = models.ManyToManyField('Category', related_name='blogposts')
@@ -27,6 +29,9 @@ class BlogPost(models.Model):
                 unique_slug = f'{original_slug}-{counter}'
                 counter += 1
             self.slug = unique_slug
+        
+        if self.is_published and self.published_date == None:
+            self.published_date = timezone.now()
 
         super().save(*args, **kwargs)
             
@@ -42,7 +47,7 @@ class BlogPost(models.Model):
         return f'{self.title} ({self.author.username})'
     
     class Meta:
-        ordering = ('-last_edited_date',)
+        ordering = ('-published_date',)
         verbose_name = _('Blog Post')
         verbose_name_plural = _('Blog Posts')
 

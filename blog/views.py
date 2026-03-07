@@ -8,6 +8,7 @@ from django.urls import reverse
 from django.views.generic import CreateView, DetailView, ListView, UpdateView, DeleteView
 from django.db.models import FloatField, Prefetch
 from django.core.paginator import Paginator
+from django.utils import timezone
 
 from .forms import BlogPostForm, CommentForm
 from .models import BlogPost, Comment, Category
@@ -26,9 +27,9 @@ class BlogPostListView(ListView):
         queryset = BlogPost.objects.filter(is_published=True).select_related('author').annotate(likes_count=Count('likes'))
         
         order_by = self.request.GET.get('order_by')
-        order_by_field = '-last_edited_date'
+        order_by_field = '-published_date'
         if order_by == 'date-asc':
-            order_by_field = 'last_edited_date'
+            order_by_field = 'published_date'
         elif order_by == 'like-desc':
             order_by_field = '-likes_count'
         elif order_by == 'like-asc':
@@ -38,7 +39,7 @@ class BlogPostListView(ListView):
         elif order_by == 'view-desc':
             order_by_field = '-view_count'
         else:
-            order_by_field = '-last_edited_date'
+            order_by_field = '-published_date'
         
         queryset = queryset.order_by(order_by_field)
 
@@ -76,7 +77,7 @@ class BlogPostDetailView(DetailView):
         if self.request.user.is_authenticated:
             context['user_liked'] = blogpost.like_set.filter(user=self.request.user).exists()
         else:
-            context['user_liked'] = False        
+            context['user_liked'] = False
         return context
 
 
@@ -109,7 +110,6 @@ class BlogPostCreateView(PermissionRequiredMixin, CreateView):
     
     def form_valid(self, form):
         form.instance.author = self.request.user
-        form.save()    
         return super().form_valid(form)
 
 
@@ -154,7 +154,7 @@ class CategoryDetailView(DetailView):
         queryset = self.queryset.prefetch_related(
             Prefetch(
                 'blogposts',
-                BlogPost.objects.filter(is_published=True).annotate(likes_count=Count('likes')).order_by('-last_edited_date')
+                BlogPost.objects.filter(is_published=True).annotate(likes_count=Count('likes')).order_by('-published_date')
             ),
             'blogposts__author'
         )

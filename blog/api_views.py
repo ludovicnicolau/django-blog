@@ -17,13 +17,13 @@ class BlogPostAPIViewSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['title', 'content',]
-    ordering = ['-last_edited_date',]
-    ordering_fields = ['last_edited_date', 'title', 'likes_count']
+    ordering = ['-published_date',]
+    ordering_fields = ['published_date', 'title', 'likes_count']
     lookup_field = 'slug'
     lookup_url_kwarg = 'slug'
     
     def get_queryset(self):
-        queryset = self.queryset.annotate(likes_count=Count('like')).order_by('-last_edited_date').select_related('author')
+        queryset = self.queryset.annotate(likes_count=Count('like')).order_by('-published_date').select_related('author')
         author_username = self.request.GET.get('author')
         if author_username:
             queryset = queryset.filter(author__username=author_username, author__is_active=True) # If the author has deleted his account, we do not show any of his blog posts

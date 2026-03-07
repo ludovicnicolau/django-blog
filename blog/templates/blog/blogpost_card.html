@@ -36,7 +36,9 @@
             <div><i class="bi bi-hand-thumbs-up"></i> {{ blog_post.likes_count }}</div>
             <div><i class="bi bi-eye"></i> {{ blog_post.view_count }}</div>
         </div>
-        <small class="text-body-secondary">{{ blog_post.last_edited_date.date }}</small>
+        {% if blog_post.published_date %}
+            <small class="text-body-secondary">{{ blog_post.published_date.date }}</small>
+        {% endif %}
     </div>
     {% if not blog_post.is_published %}
         <div class="position-absolute fs-1 top-50 start-50 fw-bold" style="transform: translate(-50%, -50%) rotate(-45deg); color: lightgray; text-shadow: 3px 3px 3px gray">

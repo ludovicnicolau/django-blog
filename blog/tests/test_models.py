@@ -66,9 +66,9 @@ class BlogPostModelTest(TestCase):
         post = BlogPost.objects.get(title='A simple title.')
         self.assertEqual(post.get_absolute_url(), f'/blog/{post.slug}/')
     
-    def test_ordered_last_edited_first(self):
+    def test_ordered_most_recently_published_first(self):
         posts = BlogPost.objects.all()
-        self.assertGreater(posts[0].last_edited_date, posts[1].last_edited_date)
+        self.assertGreater(posts[0].published_date, posts[1].published_date)
     
     def test_get_author_username_display_with_existing_author(self):
         username = 'Author'

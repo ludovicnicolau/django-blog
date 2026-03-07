@@ -113,7 +113,7 @@ class BlogPostListViewTest(TestCase):
     
     def test_blog_posts_most_recent_first(self):
         response = self.client.get(reverse('blog:blogs'))
-        self.assertGreater(response.context['blog_posts'][0].last_edited_date, response.context['blog_posts'][1].last_edited_date)
+        self.assertGreater(response.context['blog_posts'][0].published_date, response.context['blog_posts'][1].published_date)
     
     def test_use_the_correct_template(self):
         response = self.client.get(reverse('blog:blogs'))
