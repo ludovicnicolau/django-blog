@@ -20,6 +20,8 @@ from django.views.generic import RedirectView
 from rest_framework_simplejwt.views import (TokenObtainPairView,
                                             TokenRefreshView, TokenVerifyView)
 from django.http import HttpResponse
+from django.conf import settings
+
 
 def health_check(request):
     return HttpResponse("OK", status=200)
@@ -33,7 +35,6 @@ urlpatterns = [
     path('users/', include('users.urls')),
     path('users/', include('django.contrib.auth.urls')),
     path('tinymce/', include('tinymce.urls')),
-    path('silk/', include('silk.urls', namespace='silk')),
     # REST API
     path('api/blog/', include('blog.api_urls')),
     path('api/users/', include('users.api_urls')),
@@ -42,3 +43,8 @@ urlpatterns = [
     path('api/token/refresh', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += [
+        path('silk/', include('silk.urls', namespace='silk')),
+    ]
