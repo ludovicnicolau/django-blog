@@ -24,4 +24,4 @@ USER appuser
 RUN python manage.py collectstatic --noinput
 
 # During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
-CMD python manage.py migrate --noinput || true && python manage.py init_groups && python manage.py createsuperuser --noinput && gunicorn --bind 0.0.0.0:10000 --workers=2 website.wsgi
+CMD python manage.py migrate --noinput || true && python manage.py init_groups && gunicorn --bind 0.0.0.0:10000 --workers=2 website.wsgi
