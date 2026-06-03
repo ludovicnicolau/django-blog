@@ -6,6 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from tinymce.models import HTMLField
 from django.utils.text import slugify
 from django.utils import timezone
+from django.templatetags.static import static
 
 
 class BlogPost(models.Model):
@@ -19,6 +20,7 @@ class BlogPost(models.Model):
     likes = models.ManyToManyField(settings.AUTH_USER_MODEL, through='Like')
     categories = models.ManyToManyField('Category', related_name='blogposts')
     view_count = models.PositiveBigIntegerField(default=0, blank=True, null=True)
+    thumbnail = models.ImageField(upload_to='blogposts/thumbnails/', blank=True, null=True, default='')
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -39,6 +41,13 @@ class BlogPost(models.Model):
     @property
     def get_author_username_display(self):
         return self.author.username if self.author and self.author.is_active else 'Anonymous'
+    
+    @property
+    def thumbnail_url(self):
+        if self.thumbnail:
+            return self.thumbnail.url
+        return static('images/default-thumbnail.png')
+        
 
     def get_absolute_url(self):
         return reverse("blog:blog-detail", kwargs={"slug": self.slug})
