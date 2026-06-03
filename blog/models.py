@@ -46,8 +46,7 @@ class BlogPost(models.Model):
     def thumbnail_url(self):
         if self.thumbnail:
             return self.thumbnail.url
-        return static('images/default-thumbnail.png')
-        
+        return static('images/default-thumbnail.png')        
 
     def get_absolute_url(self):
         return reverse("blog:blog-detail", kwargs={"slug": self.slug})
