@@ -1,25 +1,32 @@
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from blog.models import BlogPost, Comment, Category
 from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.templatetags.static import static
+
+from tempfile import TemporaryDirectory
 
 import time
 
 User = get_user_model()
 
-
+@override_settings(MEDIA_ROOT=TemporaryDirectory().name)
 class BlogPostModelTest(TestCase):
     @classmethod
     def setUpTestData(cls):
+        image = SimpleUploadedFile("test.jpg", b"Fake image content", content_type="image/jpeg")
+
         author = User.objects.create_user(username='Author', password='topsecret')
-        BlogPost.objects.create(
+        cls.blogpost_with_image = BlogPost.objects.create(
             title='A simple title.',
             content='A very long text that should contains a lot of useful informations.',
             author=author,
-            is_published=True
+            is_published=True,
+            thumbnail=image
         )
         time.sleep(0.1)
-        BlogPost.objects.create(
+        cls.blogpost_without_image = BlogPost.objects.create(
             title='A second post.',
             content='The content.',
             author=author,
@@ -78,6 +85,16 @@ class BlogPostModelTest(TestCase):
     def test_get_author_username_display_with_no_author(self):
         post = BlogPost.objects.get(title='A third post.')
         self.assertEqual('Anonymous', post.get_author_username_display)
+    
+    def test_thumbnail_url_property(self):
+        url = self.blogpost_with_image.thumbnail_url
+        self.assertEqual(url, '/media/blogposts/thumbnails/test.jpg')
+        url = self.blogpost_without_image.thumbnail_url
+        self.assertEqual(url, static('images/default-thumbnail.png'))
+    
+    def test_thumbnail_storage_to(self):
+        self.assertTrue(self.blogpost_with_image.thumbnail.name.startswith('blogposts/thumbnails'))
+
 
 
 class CommentModelTest(TestCase):
