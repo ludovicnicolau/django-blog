@@ -24,6 +24,7 @@
 **/secrets.dev.yaml
 **/values.dev.yaml
 **/db.sqlite3
+media
 LICENSE
 README.md
 TODO

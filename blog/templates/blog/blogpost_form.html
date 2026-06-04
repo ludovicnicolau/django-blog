@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-    <form action="" method="post">
+    <form action="" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="form-group mb-4">
             {{ form.title.label_tag }}
@@ -24,6 +24,10 @@
         <div class="mb-4 form-switch form-check">
             <label for="{{ form.is_published.id_for_label }}">{{ form.is_published.label }}</label>
             {{ form.is_published }}
+        </div>
+        <div class="mb-4">
+            <label for="{{ form.thumbnail.id_for_label }}">{% trans 'Choose a thumbnail' %}</label>
+            {{ form.thumbnail }}
         </div>
         <input type="submit" value="{% trans 'Publish' %}" class="btn btn-primary">
     </form>
