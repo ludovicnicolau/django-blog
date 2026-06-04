@@ -1,12 +1,12 @@
 {% load i18n %}
 
-<ul class="row g-2 list-unstyled blogpost_list">
+<div class="row row-cols-2 row-cols-sm-3 row-cols-lg-4 row-cols-xl-4 g-2 mx-auto blogpost_list">
     {% for blog_post in blog_posts %}
-        <li class="col-lg-4 col-12">
-          {% include 'blog/blogpost_card.html' with blog_post=blog_post %}
-        </li>
+        <div class="col">
+            {% include 'blog/blogpost_card.html' with blog_post=blog_post %}
+        </div>
     {% endfor %}
-</ul>
+</div>
 
 {% include 'modals/confirm_delete_modal.html' %}
 

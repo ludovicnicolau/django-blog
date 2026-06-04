@@ -1,5 +1,19 @@
 {% load i18n %}
 
+<a class="blogpost-card card h-100 text-decoration-none" href="{{ blog_post.get_absolute_url }}">
+    <img class="card-img-top" src="{{ blog_post.thumbnail_url }}" alt="{{ blog_post.title }}">
+    <div class="card-body">
+        <div class="card-title">{{ blog_post.title }}</div>
+    </div>
+    <div class="card-footer d-flex justify-content-between align-items-center">
+        <small class="text-muted">{{ blog_post.published_date.date }}</small>
+        <div class="d-flex align-items-center gap-3">
+            <div><i class="bi bi-hand-thumbs-up"></i> {{ blog_post.likes_count }}</div>
+            <div><i class="bi bi-eye"></i> {{ blog_post.view_count }}</div>
+        </div>
+    </div>
+</a>
+<!-- 
 <div class="blogpost-card card h-100">
     <div class="card-header d-flex flex-row justify-content-between align-items-start">
         <h4 class="card-title text-primary"><a class="text-reset" href="{{ blog_post.get_absolute_url }}">{{ blog_post.title }}</a></h4>
@@ -45,4 +59,4 @@
             Hidden
         </div>
     {% endif %}
-</div>
+</div> -->
