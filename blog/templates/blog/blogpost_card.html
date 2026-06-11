@@ -1,7 +1,9 @@
 {% load i18n %}
 
 <a class="blogpost-card card h-100 text-decoration-none" href="{{ blog_post.get_absolute_url }}">
-    <img class="card-img-top" src="{{ blog_post.thumbnail_url }}" alt="{{ blog_post.title }}">
+    <div class="ratio ratio-4x3">
+        <img class="card-img-top object-fit-cover" src="{{ blog_post.thumbnail_url }}" alt="{{ blog_post.title }}">
+    </div>
     <div class="card-body">
         <div class="card-title">{{ blog_post.title }}</div>
     </div>
