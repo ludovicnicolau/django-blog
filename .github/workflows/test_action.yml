@@ -13,4 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Launch tests
-      run: docker compose -f compose.test.yaml up --build --abort-on-container-exit
+      run: |
+        SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
+        SUPABASE_KEY=${{ secrets.SUPABASE_KEY }} \
+        docker compose -f compose.test.yaml up --build --abort-on-container-exit
