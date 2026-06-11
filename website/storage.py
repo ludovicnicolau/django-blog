@@ -19,7 +19,7 @@ class SupabaseStorage(Storage):
         last_slash_index = name.rfind('/')
         path = name[:last_slash_index+1]
         extension = name.split('.')[1]
-        new_name = f'{path}{uuid.uuid()}.{extension}'
+        new_name = f'{path}{uuid.uuid4()}.{extension}'
 
         self.client.storage.from_(self.bucket_name).upload(
             new_name,

@@ -25,6 +25,9 @@ class BlogPostModelTest(TestCase):
             is_published=True,
             thumbnail=image
         )
+        cls.storage = cls.blogpost_with_image.thumbnail.storage
+        cls.thumbnail_name = cls.blogpost_with_image.thumbnail.name
+
         time.sleep(0.1)
         cls.blogpost_without_image = BlogPost.objects.create(
             title='A second post.',
@@ -88,13 +91,19 @@ class BlogPostModelTest(TestCase):
     
     def test_thumbnail_url_property(self):
         url = self.blogpost_with_image.thumbnail_url
-        self.assertEqual(url, '/media/blogposts/thumbnails/test.jpg')
+        name = self.blogpost_with_image.thumbnail.name
+        start = url.find('/media/')
+        self.assertEqual(url[start:], f'/media/{name}')
         url = self.blogpost_without_image.thumbnail_url
         self.assertEqual(url, static('images/default-thumbnail.png'))
     
     def test_thumbnail_storage_to(self):
         self.assertTrue(self.blogpost_with_image.thumbnail.name.startswith('blogposts/thumbnails'))
 
+    @classmethod
+    def tearDownClass(cls):
+        cls.storage.delete(cls.thumbnail_name)
+        super().tearDownClass()
 
 
 class CommentModelTest(TestCase):
