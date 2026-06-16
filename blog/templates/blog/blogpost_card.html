@@ -1,11 +1,35 @@
 {% load i18n %}
 
-<a class="blogpost-card card h-100 text-decoration-none" href="{{ blog_post.get_absolute_url }}">
+<div class="blogpost-card card h-100 text-decoration-none position-relative">
+    <a href="{{ blog_post.get_absolute_url }}" class="position-absolute p-0 z-1 top-0 end-0 bottom-0 start-0 border"></a>
+    {% if user == blog_post.author %}
+        <div class="dropstart bg z-2">
+            <button class="btn text-end border-dark bg-white position-absolute end-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-three-dots-vertical"></i>
+            </button>
+            <ul class="dropdown-menu p-2">
+                <li>
+                    <a class="text-decoration-none" href="{% url 'blog:blog-update' slug=blog_post.slug %}" aria_label="{% trans 'Edit blog post' %}" title="{% trans 'Edit blog post' %}">
+                        <i class="bi bi-pencil-square"></i> {% trans 'Edit...' %}
+                    </a>
+                </li>
+                <li>
+                    <form class="delete-blogpost-form dropdown-item d-inline p-0" action="{% url 'blog:blog-delete' slug=blog_post.slug %}?next={{ request.path }}" method="post">
+                        {% csrf_token %}
+                        <button class="btn btn-link text-danger text-decoration-none p-0" type="submit" aria_label="{% trans 'Delete blog post' %}" title="{% trans 'Delete blog post' %}">
+                            <i class="bi bi-trash3"></i> {% trans 'Delete' %}
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    {% endif %}
     <div class="ratio ratio-4x3">
-        <img class="card-img-top object-fit-cover" src="{{ blog_post.thumbnail_url }}" alt="{{ blog_post.title }}">
+        <img class="card-img-top object-fit-cover z-0" src="{{ blog_post.thumbnail_url }}" alt="{{ blog_post.title }}">
     </div>
     <div class="card-body">
-        <div class="card-title">{{ blog_post.title }}</div>
+        <h5 class="card-title">{{ blog_post.title }}</h5>
+        <h6 class="card-subtitle"><a href="{{ blog_post.author.get_absolute_url }}" class="text-muted position-relative z-3">{{ blog_post.author }}</a></h6>
     </div>
     <div class="card-footer d-flex justify-content-between align-items-center">
         <small class="text-muted">{{ blog_post.published_date.date }}</small>
@@ -14,7 +38,7 @@
             <div><i class="bi bi-eye"></i> {{ blog_post.view_count }}</div>
         </div>
     </div>
-</a>
+</div>
 <!-- 
 <div class="blogpost-card card h-100">
     <div class="card-header d-flex flex-row justify-content-between align-items-start">
