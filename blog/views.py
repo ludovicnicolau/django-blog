@@ -21,7 +21,7 @@ def home(request):
 class BlogPostListView(ListView):
     model = BlogPost
     context_object_name = 'blog_posts'
-    paginate_by = 9
+    paginate_by = 12
 
     def get_queryset(self):
         queryset = BlogPost.objects.filter(is_published=True).select_related('author').annotate(likes_count=Count('likes'))

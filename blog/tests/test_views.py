@@ -119,15 +119,15 @@ class BlogPostListViewTest(TestCase):
         response = self.client.get(reverse('blog:blogs'))
         self.assertTemplateUsed(response, 'blog/blogpost_list.html')
 
-    def test_paginated_by_9_and_display_only_published(self):
+    def test_paginated_by_12_and_display_only_published(self):
         response = self.client.get(reverse('blog:blogs'))
         number_of_blogs = len(response.context['blog_posts'])
-        self.assertEqual(number_of_blogs, 9)
+        self.assertEqual(number_of_blogs, 12)
         page_obj = response.context['page_obj']
         next_page_url = reverse('blog:blogs') + f'?page={page_obj.next_page_number()}'
         response = self.client.get(next_page_url)
         number_of_blogs = len(response.context['blog_posts'])
-        self.assertEqual(number_of_blogs, 8)
+        self.assertEqual(number_of_blogs, 5)
 
 
 class CommentCreateViewTest(TestCase):
