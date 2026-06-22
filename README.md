@@ -90,13 +90,13 @@ openssl req -new -x509 -key server.key -out server.crt -days 365
 
 They should be called *server.key* and *server.crt* and be placed at the root next to compose.yaml and nginx.conf.
 
-### ⚠️ Important note (you should add this)
+### ⚠️ Important note
 
 ```md
 ⚠️ This certificate is self-signed and will trigger a browser security warning.
 This is expected in development environments. You should not use this method for production.
 You can also use something like mkcert to avoid the browser security warning.
-For production, you should use a *Certificate Authority* like *Let's Encrypt*
+For production, you should use a **Certificate Authority** like **Let's Encrypt**
 
 ## Testing
 
